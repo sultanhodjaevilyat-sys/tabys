@@ -18,9 +18,13 @@ page.on('console', (m) => { if (m.type() === 'error') errors.push(`console: ${m.
 const results = []
 async function check(name, path, expectText, extra) {
   const before = errors.length
-  await page.goto(BASE + path, { waitUntil: 'networkidle' })
-  await page.getByText(expectText, { exact: false }).first().waitFor({ timeout: 15000 })
-  if (extra) await extra()
+  try {
+    await page.goto(BASE + path, { waitUntil: 'networkidle' })
+    await page.getByText(expectText, { exact: false }).first().waitFor({ timeout: 15000 })
+    if (extra) await extra()
+  } catch (e) {
+    errors.push(`${name}: ${e.message.split('\n')[0]}`)
+  }
   await page.screenshot({ path: `${OUT}/${name}.png`, fullPage: true })
   const ok = errors.length === before
   results.push({ name, path, ok })
@@ -49,9 +53,12 @@ await check('audit', '/audit', 'перерасход', async () => {
 })
 await check('insights', '/insights', 'Матрица меню')
 await check('assistant', '/assistant', 'AI-ассистент владельца', async () => {
+  const answers = page.locator('.msg.model .bubble')
   await page.getByRole('button', { name: 'Где я теряю деньги?' }).click()
-  await page.locator('.msg.model .bubble', { hasText: 'Говядина' }).waitFor({ timeout: 20000 })
-  console.log('  агент ответил про говядину')
+  await page.waitForFunction(() => document.querySelectorAll('.msg.model .bubble:not(.typing)').length >= 2, null, { timeout: 30000 })
+  const answer = await answers.last().innerText()
+  console.log('  ответ агента: ' + answer.replace(/\n/g, ' | ').slice(0, 300))
+  if (!answer.includes('Говядина')) throw new Error('в ответе агента нет «Говядина»')
 })
 await check('pricing', '/pricing', 'Tabys Бизнес', async () => {
   await page.locator('.plan', { hasText: 'Tabys Бизнес' }).getByRole('button').click()
