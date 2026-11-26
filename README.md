@@ -74,7 +74,10 @@ cd backend
 pip install -r requirements.txt httpx
 python -m unittest -v      # 11 unit-тестов аналитики + 8 тестов API
 ```
-Те же тесты и сборка фронтенда автоматически запускаются в GitHub Actions при каждом push и Pull Request.
+В GitHub Actions при каждом push и Pull Request автоматически запускаются три задачи:
+1. **Backend tests** — те же 19 тестов;
+2. **Frontend build** — `npm run build`;
+3. **E2E smoke** — поднимает бэкенд и сайт, открывает все 9 страниц в Chromium (Playwright, `e2e/smoke.mjs`): 3D-модель, чат с агентом, оплата. Скриншоты страниц сохраняются в артефакты прогона.
 
 ## Страницы
 
