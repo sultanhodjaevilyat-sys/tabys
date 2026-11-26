@@ -9,11 +9,13 @@ export function StatCard({ label, value, hint, tone }) {
   )
 }
 
-export function PageHeader({ title, children }) {
+export function PageHeader({ title, children, how }) {
   return (
     <div className="page-head">
       <h1>{title}</h1>
       {children && <p className="lead">{children}</p>}
+      {/* Формулы — под «Как считается?»: владельцу сначала нужен смысл, а не математика */}
+      {how && <details className="how"><summary>Как считается?</summary><p>{how}</p></details>}
     </div>
   )
 }
