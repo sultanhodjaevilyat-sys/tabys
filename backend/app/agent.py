@@ -36,7 +36,36 @@ TOOLS = [
      "parameters": {"type": "OBJECT", "properties": {}}},
     {"name": "get_menu_matrix", "description": "Инженерия меню: блюда по группам Звезда/Лошадка/Загадка/Собака, маржа и советы.",
      "parameters": {"type": "OBJECT", "properties": {}}},
+    {"name": "get_dish_info", "description": "Всё об одном блюде: цена, техкарта и себестоимость, маржа, продажи за 4 недели, прогноз на неделю, группа в матрице меню и совет.",
+     "parameters": {"type": "OBJECT", "properties": {
+         "dish_name": {"type": "STRING", "description": "Название блюда из меню, например «Лагман» или «Капучино»"}},
+         "required": ["dish_name"]}},
 ]
+
+
+def find_dish(name: str, dishes: list):
+    """Ищем блюдо по названию без учёта регистра: «лагман» → «Лагман»."""
+    q = (name or "").strip().lower()
+    for d in dishes:
+        if d["name"].lower() == q:
+            return d
+    return next((d for d in dishes if q and (q in d["name"].lower() or d["name"].lower().split()[0][:5] in q)), None)
+
+
+def dish_info(name: str, data: dict) -> dict:
+    s, d, r, i = data["sales"], data["dishes"], data["recipes"], data["ingredients"]
+    dish = find_dish(name, d)
+    if not dish:
+        return {"error": f"Блюдо «{name}» не найдено", "menu": [x["name"] for x in d]}
+    mx = next(x for x in a.menu_matrix(s, d, r, i)["items"] if x["dish_id"] == dish["id"])
+    fc = next(x for x in a.forecast(s, d) if x["dish_id"] == dish["id"])
+    ing = {x["id"]: x for x in i}
+    recipe = [{"ingredient": ing[x["ingredient_id"]]["name"], "qty": x["qty"], "unit": ing[x["ingredient_id"]]["unit"],
+               "cost": round(x["qty"] * ing[x["ingredient_id"]]["cost"], 1)} for x in r if x["dish_id"] == dish["id"]]
+    return {"dish": dish["name"], "price": dish["price"], "cost": mx["cost"], "margin": mx["margin"],
+            "food_cost_pct": mx["food_cost_pct"], "sold_28d": mx["sold"], "share_pct": mx["share"],
+            "group": mx["group"], "advice": mx["advice"], "forecast_7d": fc["total"], "trend": fc["trend"],
+            "recipe": recipe}
 
 
 def run_tool(name: str, args: dict, data: dict):
@@ -54,6 +83,8 @@ def run_tool(name: str, args: dict, data: dict):
         return [x for x in a.purchase_order(a.forecast(s, d), r, i) if x["to_buy"] > 0]
     if name == "get_menu_matrix":
         return a.menu_matrix(s, d, r, i)
+    if name == "get_dish_info":
+        return dish_info(args.get("dish_name", ""), data)
     return {"error": f"unknown tool {name}"}
 
 
@@ -124,6 +155,17 @@ def _plural(n, one, few, many):
 
 def ask_demo(question: str, data: dict) -> dict:
     q = question.lower()
+    dish = next((x for x in data["dishes"] if x["name"].lower().split()[0][:5] in q), None)
+    if dish:  # вопрос про конкретное блюдо → инструмент с параметром
+        res = run_tool("get_dish_info", {"dish_name": dish["name"]}, data)
+        recipe = ", ".join(f"{x['ingredient'].lower()} {_num(x['qty'])} {x['unit']}" for x in res["recipe"])
+        answer = (f"{res['dish']}: цена {_fmt(res['price'])} ₸, себестоимость {_fmt(res['cost'])} ₸ "
+                  f"(food cost {_num(res['food_cost_pct'])} %), маржа {_fmt(res['margin'])} ₸ с порции.\n"
+                  f"Техкарта: {recipe}.\n"
+                  f"Продано за 4 недели: {res['sold_28d']} {_plural(res['sold_28d'], 'порция', 'порции', 'порций')}, "
+                  f"прогноз на неделю — {res['forecast_7d']}.\n"
+                  f"Группа в матрице меню: {res['group']}. Совет: {res['advice']}")
+        return {"answer": answer, "tools_used": ["get_dish_info"], "mode": "demo"}
     tools = [t for t, words in KEYWORDS if any(w in q for w in words)] or ["get_dashboard", "get_stock_losses"]
     if any(w in q for w in ["потер", "теря", "кража", "ворует"]):  # общий вопрос о потерях = склад + касса
         tools = ["get_stock_losses", "get_cashier_anomalies"]
