@@ -1,5 +1,7 @@
 # Tabys
 
+[![CI](https://github.com/sultanhodjaevilyat-sys/tabys/actions/workflows/ci.yml/badge.svg)](https://github.com/sultanhodjaevilyat-sys/tabys/actions/workflows/ci.yml)
+
 **Tabys** (каз. «табыс» — доход, прибыль) — веб-система автоматизации кафе и ресторанов, которая не только считает деньги, но и находит, где они теряются.
 
 Касса, меню и техкарты, склад, оплата подписки — плюс модуль «Интеллект»:
@@ -9,6 +11,15 @@
 - **AI-ассистент владельца** — агент на Gemini с вызовом функций (tool calling): сам достаёт данные из БД и отвечает простыми словами;
 - **PaySystem** — подписка на Tabys через Stripe Checkout (тестовый режим) + webhook;
 - **3D-модель** рабочего места кассира на главной (three.js): вращается сама, крутится мышкой.
+
+## Ссылки
+
+| Что | Где |
+|---|---|
+| Дизайн в Figma (дизайн-система + 8 desktop + 3 mobile экрана) | https://www.figma.com/design/WveOJjh2JQ1AHckUkBgZOz |
+| Архитектура и UML (компоненты, ER, sequence, навигация) | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| Вопросы к защите и инструкция «что, где, как добавлять» | [docs/GRILL_ME.md](docs/GRILL_ME.md) |
+| Задачи команды | [docs/milestone2-tasks.md](docs/milestone2-tasks.md) |
 
 ## Команда (группа IT-1 2315)
 
@@ -56,6 +67,19 @@ npm run dev
 **PostgreSQL вместо SQLite:** `docker compose up db`, затем в `backend/.env`:
 `DATABASE_URL=postgresql+psycopg2://tabys:tabys@localhost:5432/tabys`
 
+## Тесты
+
+```bash
+cd backend
+pip install -r requirements.txt httpx
+python -m unittest -v      # 16 unit-тестов (формулы, формат чисел, агент) + 8 тестов API
+```
+В GitHub Actions при каждом push и Pull Request автоматически запускаются четыре задачи:
+1. **Backend tests** — те же 24 теста на Python 3.10 и 3.12;
+2. **Frontend build** — `npm run build`;
+3. **E2E smoke** — поднимает бэкенд и сайт, открывает все 9 страниц в Chromium (Playwright, `e2e/smoke.mjs`): 3D-модель, чат с агентом, оплата. Скриншоты страниц сохраняются в артефакты прогона;
+4. **Docker compose** — собирает и запускает PostgreSQL + бэкенд + nginx, проверяет сайт и API на настоящей базе.
+
 ## Страницы
 
 | Маршрут | Страница |
@@ -73,7 +97,7 @@ npm run dev
 
 ## Как работают ключевые части
 
-**AI-агент** (`backend/app/agent.py`): вопрос + описание 6 функций → Gemini решает, какую функцию вызвать → бэкенд выполняет её на данных БД → Gemini пишет ответ с цифрами. Без ключа — демо-режим (функция выбирается по ключевым словам), помечается в интерфейсе.
+**AI-агент** (`backend/app/agent.py`): вопрос + описание 7 функций (одна с параметром — название блюда) → Gemini решает, какую функцию вызвать → бэкенд выполняет её на данных БД → Gemini пишет ответ с цифрами. Без ключа — демо-режим (функция выбирается по ключевым словам), помечается в интерфейсе.
 
 **Оплата** (`backend/app/billing.py`): `POST /api/billing/checkout` создаёт Stripe Checkout Session → пользователь платит тестовой картой `4242 4242 4242 4242` → webhook `checkout.session.completed` (или проверка `/api/billing/verify`) ставит подписке статус `active`.
 
