@@ -1,0 +1,19 @@
+# PostgreSQL + backend. Запуск: docker compose up --build
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: tabys
+      POSTGRES_PASSWORD: tabys
+      POSTGRES_DB: tabys
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+  backend:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://tabys:tabys@db:5432/tabys
+    ports: ["8000:8000"]
+    depends_on: [db]
+volumes:
+  pgdata:
