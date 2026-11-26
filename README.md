@@ -42,6 +42,21 @@
 | Оплата | Stripe Checkout, mode=subscription, webhook |
 | DevOps | Docker Compose |
 
+## Запуск одной командой (Docker)
+
+Нужен только **Docker Desktop**:
+```bash
+docker compose up --build
+```
+- Сайт: http://localhost:8080 (nginx раздаёт React и проксирует `/api` на бэкенд)
+- API: http://localhost:8000/docs
+- База: PostgreSQL 16 в контейнере `db`, тестовые данные заполняются при первом запуске
+
+Ключи Gemini и Stripe подхватываются из `backend/.env`, если файл есть; без него работает демо-режим.
+Остановить: `docker compose down` (с удалением базы: `docker compose down -v`).
+
+**Без Docker, тоже одной командой** (нужны Python и Node.js): `bash start.sh` — ставит зависимости, запускает бэкенд и сайт, открывает http://localhost:5173. Остановить: Ctrl+C.
+
 ## Запуск на компьютере
 
 Нужны **Python 3.10+** и **Node.js 18+**.
