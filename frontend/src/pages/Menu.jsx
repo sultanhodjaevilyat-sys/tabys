@@ -12,7 +12,9 @@ export default function Menu() {
   const list = cat === 'Все' ? data : data.filter((d) => d.category === cat)
   return (
     <>
-      <PageHeader title="Меню и техкарты">Себестоимость считается по техкарте: Σ (норма × цена ингредиента). Нажмите на блюдо, чтобы открыть техкарту.</PageHeader>
+      <PageHeader title="Меню и техкарты" how="Себестоимость = сумма по техкарте: норма каждого продукта × его цена. Маржа = цена − себестоимость.">
+        Цена, себестоимость и прибыль с каждой порции. Нажмите на блюдо, чтобы увидеть техкарту.
+      </PageHeader>
       <div className="filters">
         {cats.map((c) => <button key={c} className={c === cat ? 'chip active' : 'chip'} onClick={() => setCat(c)}>{c}</button>)}
       </div>
