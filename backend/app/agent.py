@@ -103,7 +103,23 @@ KEYWORDS = [
 
 
 def _fmt(n):
+    """Деньги: 106200 → «106 200»."""
     return f"{round(n):,}".replace(",", " ")
+
+
+def _num(x):
+    """Дробные числа по-русски: 26.55 → «26,55»."""
+    return f"{x:g}".replace(".", ",")
+
+
+def _plural(n, one, few, many):
+    """1 удаление, 2 удаления, 5 удалений."""
+    n = abs(int(n))
+    if n % 10 == 1 and n % 100 != 11:
+        return one
+    if 2 <= n % 10 <= 4 and not 12 <= n % 100 <= 14:
+        return few
+    return many
 
 
 def ask_demo(question: str, data: dict) -> dict:
@@ -116,29 +132,31 @@ def ask_demo(question: str, data: dict) -> dict:
     for t in tools:
         res = run_tool(t, {}, data)
         if t == "get_dashboard":
-            lines.append(f"За {res['period']}: выручка {_fmt(res['revenue'])} ₸ ({res['revenue_change_pct']:+} % к прошлой неделе), "
-                         f"{res['orders']} чеков, средний чек {_fmt(res['avg_check'])} ₸, food cost {res['food_cost_pct']} %.")
+            lines.append(f"За {res['period']}: выручка {_fmt(res['revenue'])} ₸ ({'+' if res['revenue_change_pct'] > 0 else ''}{_num(res['revenue_change_pct'])} % к прошлой неделе), "
+                         f"{res['orders']} {_plural(res['orders'], 'чек', 'чека', 'чеков')}, средний чек {_fmt(res['avg_check'])} ₸, "
+                         f"food cost {_num(res['food_cost_pct'])} %.")
         elif t == "get_stock_losses":
             bad = [x for x in res if x["suspicious"]]
             if bad:
                 for x in bad:
-                    lines.append(f"⚠️ {x['ingredient']}: перерасход {x['overuse']} {x['unit']} (+{x['overuse_pct']} %) ≈ {_fmt(x['loss_tenge'])} ₸ за 4 недели, "
+                    lines.append(f"⚠️ {x['ingredient']}: перерасход {_num(x['overuse'])} {x['unit']} (+{_num(x['overuse_pct'])} %) ≈ {_fmt(x['loss_tenge'])} ₸ за 4 недели, "
                                  f"чаще всего — {', '.join(x['worst_days'])}. Стоит проверить вечерние смены и выход порций.")
             else:
                 lines.append("Перерасхода выше 5 % не найдено.")
         elif t == "get_cashier_anomalies":
             for x in res:
                 if x["suspicious"]:
-                    lines.append(f"⚠️ Кассир {x['employee']}: {x['voids']} удалений после пречека на {_fmt(x['void_amount'])} ₸ — "
-                                 f"в {x['vs_others']} раза чаще коллег. Стоит проверить чеки и камеры.")
+                    lines.append(f"⚠️ Кассир {x['employee']}: {x['voids']} {_plural(x['voids'], 'удаление', 'удаления', 'удалений')} "
+                                 f"после пречека на {_fmt(x['void_amount'])} ₸ — в {_num(x['vs_others'])} раза чаще коллег. "
+                                 "Стоит проверить чеки и камеры.")
             if not any(x["suspicious"] for x in res):
                 lines.append("Подозрительных отклонений на кассе нет.")
         elif t == "get_forecast":
             top = res[:3]
-            lines.append("Прогноз на 7 дней: " + "; ".join(f"{f['dish']} — {f['total']} порций" for f in top) + ".")
+            lines.append("Прогноз на 7 дней: " + "; ".join(f"{f['dish']} — {f['total']} {_plural(f['total'], 'порция', 'порции', 'порций')}" for f in top) + ".")
         elif t == "get_purchase_order":
             total = sum(x["sum_tenge"] for x in res)
-            lines.append("Заказ поставщикам: " + "; ".join(f"{x['ingredient']} {x['to_buy']} {x['unit']}" for x in res[:5]) +
+            lines.append("Заказ поставщикам: " + "; ".join(f"{x['ingredient']} {_num(x['to_buy'])} {x['unit']}" for x in res[:5]) +
                          f". Итого ≈ {_fmt(total)} ₸.")
         elif t == "get_menu_matrix":
             groups = {}
