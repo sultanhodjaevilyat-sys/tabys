@@ -14,9 +14,9 @@ export default function Insights() {
   if (loading || error) return <Loader error={error} />
   return (
     <>
-      <PageHeader title="Матрица меню">
-        Метод Касаваны–Смита. Популярность высокая, если доля продаж ≥ {num(data.popularity_line_pct)} %.
-        Маржа высокая, если ≥ средней по меню ({tenge(data.avg_margin)}).
+      <PageHeader title="Матрица меню"
+        how={`Метод Касаваны–Смита. Популярность высокая, если доля продаж ≥ ${num(data.popularity_line_pct)} %. Маржа высокая, если ≥ средней по меню (${tenge(data.avg_margin)}).`}>
+        Какие блюда приносят деньги, какие стоит продвинуть или поднять в цене, а какие — убрать. Совет к каждому блюду — в таблице ниже.
       </PageHeader>
       <div className="matrix">
         <div className="axis-y">Маржа ↑</div>
