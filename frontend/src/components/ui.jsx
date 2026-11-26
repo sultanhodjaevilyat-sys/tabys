@@ -9,11 +9,13 @@ export function StatCard({ label, value, hint, tone }) {
   )
 }
 
-export function PageHeader({ title, children }) {
+export function PageHeader({ title, children, how, howLabel = 'Как считается?' }) {
   return (
     <div className="page-head">
       <h1>{title}</h1>
       {children && <p className="lead">{children}</p>}
+      {/* Формулы — под «Как считается?»: владельцу сначала нужен смысл, а не математика */}
+      {how && <details className="how"><summary>{howLabel}</summary><p>{how}</p></details>}
     </div>
   )
 }
@@ -29,13 +31,15 @@ export function Badge({ group }) {
   return <span className={`badge ${cls}`}>{icon} {group}</span>
 }
 
-export function BarChart({ items, valueKey, labelKey, format = (v) => v }) {
+export function BarChart({ items, valueKey, labelKey, format = (v) => v, short = format }) {
   const max = Math.max(...items.map((i) => i[valueKey]), 1)
   return (
     <div className="bars">
       {items.map((i) => (
         <div className="bar-col" key={i[labelKey]} title={format(i[valueKey])}>
-          <div className="bar" style={{ height: `${(i[valueKey] / max) * 100}%` }} />
+          {/* значение видно сразу, без наведения мыши: на телефоне и для 40+ подсказка title незаметна */}
+          <b className="bar-value">{short(i[valueKey])}</b>
+          <div className="bar" style={{ height: `${(i[valueKey] / max) * 80}%` }} />
           <span>{i[labelKey]}</span>
         </div>
       ))}

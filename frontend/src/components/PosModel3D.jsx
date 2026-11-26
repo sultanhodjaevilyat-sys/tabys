@@ -226,7 +226,8 @@ export default function PosModel3D({ height = 420 }) {
 
     const controls = new OrbitControls(camera, renderer.domElement)
     controls.enableDamping = true
-    controls.autoRotate = true
+    // автоповорот выключается, если в системе включено «уменьшить движение» (укачивание, вестибулярные проблемы)
+    controls.autoRotate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
     controls.autoRotateSpeed = 1.4
     controls.minDistance = 3.5
     controls.maxDistance = 11
