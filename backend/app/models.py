@@ -91,4 +91,4 @@ class Subscription(Base):
     mode: Mapped[str] = mapped_column(String(10), default="stripe")     # stripe | demo
     stripe_session_id: Mapped[str] = mapped_column(String(200), unique=True, index=True)
     stripe_subscription_id: Mapped[str] = mapped_column(String(200), default="")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)  # локальное время сервера
