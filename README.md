@@ -44,6 +44,8 @@ docker compose up --build
 Ключи Gemini и Stripe подхватываются из `backend/.env`, если файл есть; без него работает демо-режим.
 Остановить: `docker compose down` (с удалением базы: `docker compose down -v`).
 
+**Без Docker, тоже одной командой** (нужны Python и Node.js): `bash start.sh` — ставит зависимости, запускает бэкенд и сайт, открывает http://localhost:5173. Остановить: Ctrl+C.
+
 ## Запуск на компьютере
 
 Нужны **Python 3.10+** и **Node.js 18+**.
