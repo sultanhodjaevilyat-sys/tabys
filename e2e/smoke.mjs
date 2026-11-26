@@ -59,6 +59,12 @@ await check('assistant', '/assistant', 'AI-ассистент владельца
   const answer = await answers.last().innerText()
   console.log('  ответ агента: ' + answer.replace(/\n/g, ' | ').slice(0, 300))
   if (!answer.includes('Говядина')) throw new Error('в ответе агента нет «Говядина»')
+  // инструмент с параметром: агент сам берёт название блюда из вопроса
+  await page.getByRole('button', { name: 'Расскажи про лагман' }).click()
+  await page.waitForFunction(() => document.querySelectorAll('.msg.model .bubble:not(.typing)').length >= 3, null, { timeout: 30000 })
+  const dish = await answers.last().innerText()
+  console.log('  карточка блюда: ' + dish.replace(/\n/g, ' | ').slice(0, 200))
+  if (!dish.includes('Лагман') || !dish.includes('себестоимость')) throw new Error('агент не выдал карточку «Лагман»')
 })
 await check('pricing', '/pricing', 'Tabys Бизнес', async () => {
   await page.locator('.plan', { hasText: 'Tabys Бизнес' }).getByRole('button').click()
