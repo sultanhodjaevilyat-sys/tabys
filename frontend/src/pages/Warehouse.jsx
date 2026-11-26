@@ -1,4 +1,4 @@
-import { tenge } from '../api.js'
+import { num, tenge } from '../api.js'
 import { useApi } from '../useApi.js'
 import { Loader, PageHeader } from '../components/ui.jsx'
 
@@ -19,9 +19,9 @@ export default function Warehouse() {
           <tbody>
             {data.purchase_order.map((x) => (
               <tr key={x.ingredient_id} className={x.days_left < 3 ? 'warn' : ''}>
-                <td>{x.ingredient}</td><td>{x.supplier}</td><td>{x.stock} {x.unit}</td>
-                <td>{x.days_left} дн.</td><td>{x.need_week} {x.unit}</td>
-                <td><b>{x.to_buy > 0 ? `${x.to_buy} ${x.unit}` : '—'}</b></td><td>{x.sum_tenge ? tenge(x.sum_tenge) : '—'}</td>
+                <td>{x.ingredient}</td><td>{x.supplier}</td><td>{num(x.stock)} {x.unit}</td>
+                <td>{num(x.days_left)} дн.</td><td>{num(x.need_week)} {x.unit}</td>
+                <td><b>{x.to_buy > 0 ? `${num(x.to_buy)} ${x.unit}` : '—'}</b></td><td>{x.sum_tenge ? tenge(x.sum_tenge) : '—'}</td>
               </tr>
             ))}
           </tbody>
