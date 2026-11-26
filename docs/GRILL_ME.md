@@ -132,6 +132,22 @@ iiko, Paloma 365 и Rosta записывают операции, но не го�
 
 ---
 
+## Часть 9. Что добавили после проверки (PR #4, #6, #7)
+
+**39. Агент умеет только сводки?** Нет. Седьмой инструмент `get_dish_info(dish_name)` — с параметром: Gemini сам достаёт название блюда из вопроса («Расскажи про лагман»), бэкенд находит блюдо и отдаёт техкарту, себестоимость, маржу, продажи за неделю и место в матрице меню.
+> *The agent can call a tool with a parameter: the dish name.*
+
+**40. Как запустить весь проект одной командой?** `docker compose up --build` — поднимаются три контейнера: PostgreSQL 16, FastAPI и nginx с собранным React. Сайт: http://localhost:8080. nginx отдаёт страницы и пересылает `/api` на бэкенд.
+> *One command starts the database, the backend and the website.*
+
+**41. Почему цифры выглядят по-русски?** Агент и сайт пишут дробные числа с запятой (`12,5 кг`), даты как `26.11.2026` и склоняют слова: «1 чек, 2 чека, 5 чеков». Это проверено автотестами.
+> *Numbers, dates and word endings follow Russian rules.*
+
+**42. Что проверяет CI сейчас?** 4 задачи: 24 теста бэкенда на Python 3.10 и 3.12, сборка фронтенда, e2e в Chromium по всем страницам и запуск docker compose с проверкой сайта и API на настоящем PostgreSQL.
+> *Every pull request is tested automatically in four jobs.*
+
+---
+
 # Что, где и как добавлять
 
 | Хочу добавить… | Где | Как |
@@ -142,6 +158,8 @@ iiko, Paloma 365 и Rosta записывают операции, но не го�
 | **Новый инструмент AI-агенту** | `backend/app/agent.py` | 1) описание в `TOOLS` (name, description, parameters) 2) ветка в `run_tool` 3) (необязательно) ключевые слова в `KEYWORDS` для демо-режима |
 | **Новый тариф** | `backend/app/billing.py` | Добавить запись в `PLANS` — страница тарифов подхватит сама |
 | **Новое блюдо / продукт** | `backend/app/datagen.py` | Добавить в `DISHES` / `INGREDIENTS` и техкарту в `RECIPES`, удалить `tabys.db`, перезапустить бэкенд |
+| **Новый инструмент AI-агенту** | `backend/app/agent.py` | Описание в `TOOLS` (имя, параметры), ветка в `run_tool`, ключевые слова в `KEYWORDS` для демо-режима |
+| **Запуск в Docker** | `docker-compose.yml` | `docker compose up --build` → http://localhost:8080; ключи из `backend/.env` |
 | **Новую таблицу в БД** | `backend/app/models.py` | Класс-модель SQLAlchemy; таблица создастся при старте (`create_all`) |
 | **Ключ Gemini / Stripe** | `backend/.env` | `GEMINI_API_KEY=...`, `STRIPE_SECRET_KEY=sk_test_...`, перезапустить uvicorn |
 | **PostgreSQL** | `backend/.env` | `docker compose up db` и `DATABASE_URL=postgresql+psycopg2://tabys:tabys@localhost:5432/tabys` |
