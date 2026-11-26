@@ -92,7 +92,7 @@ sequenceDiagram
   participant A as analytics.py + БД
   O->>FE: «Где я теряю деньги?»
   FE->>BE: POST {message, history}
-  BE->>G: вопрос + описание 6 функций (tools)
+  BE->>G: вопрос + описание 7 функций (tools)
   G-->>BE: functionCall get_stock_losses()
   BE->>A: stock_losses(...)
   A-->>BE: Говядина +6,8 % ≈ 106 200 ₸
@@ -146,4 +146,18 @@ flowchart TD
 
 ## 6. Дизайн
 
-Figma: https://www.figma.com/design/WveOJjh2JQ1AHckUkBgZOz — страница «Дизайн-система» (цвета-переменные, 9 стилей текста, компоненты Button, Chip, Badge, StatCard, FeatureCard, IncidentCard, NavBar, Footer), «Desktop 1440» (8 экранов), «Mobile 390» (3 экрана).
+Figma: https://www.figma.com/design/WveOJjh2JQ1AHckUkBgZOz — страница «Дизайн-система» (цвета-переменные, 9 стилей текста, компоненты Button, Chip, Badge, StatCard, FeatureCard, IncidentCard, NavBar, NavBar Mobile, Footer), «Desktop 1440» (10 экранов), «Mobile 390» (3 экрана).
+
+## 7. Развёртывание (docker compose)
+
+```mermaid
+flowchart LR
+  U["Браузер"] -->|":8080"| N["frontend: nginx<br/>собранный React"]
+  N -->|"/api/*"| B["backend: FastAPI<br/>uvicorn :8000"]
+  B -->|"SQLAlchemy"| D[("db: PostgreSQL 16<br/>том pgdata")]
+  B -.->|"HTTPS"| G["Google Gemini API"]
+  B -.->|"HTTPS"| S["Stripe API"]
+  S -.->|"webhook"| B
+```
+
+Команда `docker compose up --build`. Бэкенд ждёт, пока PostgreSQL пройдёт healthcheck, при первом старте создаёт таблицы и заполняет тестовые данные. Та же сборка проверяется в GitHub Actions (задача «Docker compose»).
