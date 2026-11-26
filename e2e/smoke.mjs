@@ -67,6 +67,26 @@ await check('pricing', '/pricing', 'Tabys Бизнес', async () => {
 })
 await check('notfound', '/no-such-page', '404')
 
+// Телефон 390×844 (iPhone 12–15): страница не должна быть шире экрана, бургер-меню должно работать
+await page.setViewportSize({ width: 390, height: 844 })
+const noOverflow = async () => {
+  const extra = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)
+  if (extra > 1) throw new Error(`страница шире экрана телефона на ${extra} px`)
+}
+for (const [name, path, text] of [
+  ['m-home', '/', 'находит, где теряются деньги'],
+  ['m-dashboard', '/dashboard', 'Выручка за 7 дней'],
+  ['m-warehouse', '/warehouse', 'Заказ поставщикам'],
+  ['m-audit', '/audit', 'Ерлан'],
+  ['m-assistant', '/assistant', 'AI-ассистент владельца'],
+]) await check(name, path, text, noOverflow)
+await check('m-burger', '/dashboard', 'Выручка за 7 дней', async () => {
+  await page.locator('.burger').click()
+  await page.getByRole('link', { name: 'Аудитор потерь' }).click()
+  await page.getByText('Ерлан').first().waitFor()
+  console.log('  бургер-меню на телефоне открывается и ведёт на страницу')
+})
+
 await browser.close()
 if (errors.length) {
   console.error('\nОшибки в браузере:\n' + errors.join('\n'))
