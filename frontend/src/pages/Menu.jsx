@@ -21,8 +21,8 @@ export default function Menu() {
           <div className="card dish" key={d.id} onClick={() => setOpen(open === d.id ? null : d.id)}>
             <div className="dish-top"><span className="emoji">{d.emoji}</span><Badge group={d.group} /></div>
             <h3>{d.name}</h3>
-            <div className="dish-meta"><b>{tenge(d.price)}</b><span>себест. {tenge(d.cost)}</span><span>маржа {tenge(d.margin)}</span></div>
-            <div className="muted">Продано за 4 недели: {d.sold} · food cost {num(d.food_cost_pct)} %</div>
+            <div className="dish-meta"><b>{tenge(d.price)}</b><span>себестоимость {tenge(d.cost)}</span><span>маржа {tenge(d.margin)}</span></div>
+            <div className="muted">Продано за 4 недели: {d.sold} · доля себестоимости {num(d.food_cost_pct)} %</div>
             {open === d.id && (
               <table className="recipe">
                 <thead><tr><th>Ингредиент</th><th>Норма</th><th>₸</th></tr></thead>
