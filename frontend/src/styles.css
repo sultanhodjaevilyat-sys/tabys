@@ -176,7 +176,8 @@ th, td { padding: 11px 12px; }
 .stat-hint, .caption, .tools, .recipe, .pill, .bar-col span { font-size: .9rem; }
 .feature p, .dish-meta { font-size: 1rem; }
 .stat-value, .price, td { font-variant-numeric: tabular-nums; }  /* цифры одной ширины — столбцы легче сравнивать */
-.bar-value { font-size: .85rem; font-weight: 700; color: var(--ink); white-space: nowrap; }
+.bar-value { font-size: .85rem; font-weight: 700; color: var(--ink); text-align: center; line-height: 1.15; }
+.bar-col { min-width: 0; }   /* подпись не раздвигает график шире экрана */
 /* цвет — не единственный сигнал: ~8 % мужчин плохо различают красный и зелёный */
 tr.warn td:first-child::before { content: '⚠ '; }
 :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
@@ -187,3 +188,10 @@ tr.warn td:first-child::before { content: '⚠ '; }
 .how { margin-top: 4px; max-width: 820px; color: var(--muted); }
 .how summary { cursor: pointer; color: var(--green); font-weight: 600; min-height: 44px; display: flex; align-items: center; width: fit-content; }
 .how p { margin: 0 0 4px; line-height: 1.55; }
+/* Телефон: e2e-тест на 390 px нашёл горизонтальную прокрутку — исправляем */
+.composer input { min-width: 0; }          /* поле ввода сжимается, кнопка «Отправить» помещается */
+.chip { max-width: 100%; white-space: normal; text-align: left; }
+@media (max-width: 640px) {
+  .bars { gap: 6px; }
+  .bar-value { font-size: .72rem; }
+}
