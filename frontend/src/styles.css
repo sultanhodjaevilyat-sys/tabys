@@ -183,3 +183,7 @@ tr.warn td:first-child::before { content: '⚠ '; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+/* «Как считается?» — формулы спрятаны, но доступны за один клик */
+.how { margin-top: 4px; max-width: 820px; color: var(--muted); }
+.how summary { cursor: pointer; color: var(--green); font-weight: 600; min-height: 44px; display: flex; align-items: center; width: fit-content; }
+.how p { margin: 0 0 4px; line-height: 1.55; }
