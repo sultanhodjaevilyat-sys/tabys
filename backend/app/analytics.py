@@ -41,7 +41,7 @@ def dashboard(sales, dishes, recipes, ingredients, days=7):
     for s in cur:
         by_day[s["sold_at"].date()] += s["price"] * s["qty"]
     return {
-        "period": f"{start.isoformat()} — {end.isoformat()}",
+        "period": f"{start:%d.%m.%Y} — {end:%d.%m.%Y}",
         "revenue": rev,
         "revenue_change_pct": round((rev - prev_rev) / prev_rev * 100, 1),
         "orders": orders,

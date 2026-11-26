@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { tenge } from '../api.js'
+import { num, tenge } from '../api.js'
 import { useApi } from '../useApi.js'
 import { Badge, Loader, PageHeader } from '../components/ui.jsx'
 
@@ -22,11 +22,11 @@ export default function Menu() {
             <div className="dish-top"><span className="emoji">{d.emoji}</span><Badge group={d.group} /></div>
             <h3>{d.name}</h3>
             <div className="dish-meta"><b>{tenge(d.price)}</b><span>себест. {tenge(d.cost)}</span><span>маржа {tenge(d.margin)}</span></div>
-            <div className="muted">Продано за 4 недели: {d.sold} · food cost {d.food_cost_pct} %</div>
+            <div className="muted">Продано за 4 недели: {d.sold} · food cost {num(d.food_cost_pct)} %</div>
             {open === d.id && (
               <table className="recipe">
                 <thead><tr><th>Ингредиент</th><th>Норма</th><th>₸</th></tr></thead>
-                <tbody>{d.recipe.map((r) => <tr key={r.ingredient}><td>{r.ingredient}</td><td>{r.qty} {r.unit}</td><td>{r.cost}</td></tr>)}</tbody>
+                <tbody>{d.recipe.map((r) => <tr key={r.ingredient}><td>{r.ingredient}</td><td>{num(r.qty)} {r.unit}</td><td>{num(r.cost)}</td></tr>)}</tbody>
               </table>
             )}
           </div>

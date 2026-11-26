@@ -82,6 +82,17 @@ class TestAgentDemo(unittest.TestCase):
         self.assertIn("Говядина", r["answer"])
         self.assertIn("Ерлан", r["answer"])
 
+    def test_russian_number_format(self):
+        r = ask_demo("Где я теряю деньги?", DATA)
+        self.assertIn("26,55 кг", r["answer"])        # запятая, а не точка
+        self.assertIn("93 удаления", r["answer"])     # правильное окончание
+
+    def test_plural(self):
+        from app.agent import _plural
+        forms = ("удаление", "удаления", "удалений")
+        self.assertEqual([_plural(n, *forms) for n in (1, 2, 5, 11, 21, 93, 112)],
+                         ["удаление", "удаления", "удалений", "удалений", "удаление", "удаления", "удалений"])
+
     def test_purchase_question(self):
         r = ask_demo("Что заказать поставщику?", DATA)
         self.assertIn("get_purchase_order", r["tools_used"])

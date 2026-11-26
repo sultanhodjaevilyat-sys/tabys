@@ -1,4 +1,4 @@
-import { tenge } from '../api.js'
+import { num, tenge } from '../api.js'
 import { useApi } from '../useApi.js'
 import { Badge, Loader, PageHeader } from '../components/ui.jsx'
 
@@ -15,7 +15,7 @@ export default function Insights() {
   return (
     <>
       <PageHeader title="Матрица меню">
-        Метод Касаваны–Смита. Популярность высокая, если доля продаж ≥ {data.popularity_line_pct} %.
+        Метод Касаваны–Смита. Популярность высокая, если доля продаж ≥ {num(data.popularity_line_pct)} %.
         Маржа высокая, если ≥ средней по меню ({tenge(data.avg_margin)}).
       </PageHeader>
       <div className="matrix">
@@ -24,7 +24,7 @@ export default function Insights() {
           <div className={`quad q-${g}`} key={g}>
             <div className="quad-head"><Badge group={g} /><span className="muted">{hint}</span></div>
             {data.items.filter((i) => i.group === g).map((i) => (
-              <div className="pill" key={i.dish_id}>{i.emoji} {i.dish} <span className="muted">· {i.share} % · {tenge(i.margin)}</span></div>
+              <div className="pill" key={i.dish_id}>{i.emoji} {i.dish} <span className="muted">· {num(i.share)} % · {tenge(i.margin)}</span></div>
             ))}
           </div>
         ))}
@@ -37,7 +37,7 @@ export default function Insights() {
           <tbody>
             {data.items.map((i) => (
               <tr key={i.dish_id}><td>{i.emoji} {i.dish}</td><td><Badge group={i.group} /></td><td>{tenge(i.price)}</td>
-                <td>{tenge(i.margin)}</td><td>{i.share} %</td><td>{i.advice}</td></tr>
+                <td>{tenge(i.margin)}</td><td>{num(i.share)} %</td><td>{i.advice}</td></tr>
             ))}
           </tbody>
         </table>
