@@ -12,12 +12,13 @@ export default function Dashboard() {
       <div className="grid4">
         <StatCard label="Выручка за 7 дней" value={tenge(data.revenue)} hint={`${data.revenue_change_pct > 0 ? '+' : ''}${num(data.revenue_change_pct)} % к прошлой неделе`} />
         <StatCard label="Чеков" value={data.orders} hint={`Средний чек ${tenge(data.avg_check)}`} />
-        <StatCard label="Food cost" value={`${num(data.food_cost_pct)} %`} hint="Норма для кафе 25–35 %" />
+        <StatCard label="Доля себестоимости (food cost)" value={`${num(data.food_cost_pct)} %`} hint="Норма для кафе 25–35 %" />
         <StatCard label="Найдено потерь за 4 недели" value={tenge(data.losses_28d)} hint={`${data.alerts} ${plural(data.alerts, 'сигнал', 'сигнала', 'сигналов')} аудитора`} tone="danger" />
       </div>
       <div className="card">
         <h2>Выручка по дням</h2>
-        <BarChart items={data.by_day} valueKey="revenue" labelKey="day" format={tenge} />
+        <BarChart items={data.by_day} valueKey="revenue" labelKey="day" format={tenge}
+          short={(v) => `${Math.round(v / 1000).toLocaleString('ru-RU')} тыс.`} />
       </div>
       <div className="card tip">
         <b>Совет дня от Интеллекта:</b> найдено {data.alerts} {plural(data.alerts, 'сигнал', 'сигнала', 'сигналов')} о потерях. <Link to="/audit">Открыть аудитора →</Link>
