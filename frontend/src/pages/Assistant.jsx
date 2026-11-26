@@ -15,7 +15,11 @@ export default function Assistant() {
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const endRef = useRef(null)
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), [messages])
+  useEffect(() => {
+    // Фигурные скобки обязательны: эффект не должен ничего возвращать.
+    // В новых браузерах scrollIntoView() возвращает Promise, и React принял бы его за функцию очистки.
+    endRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   async function send(text) {
     const q = (text ?? input).trim()
