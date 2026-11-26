@@ -93,6 +93,25 @@ class TestAgentDemo(unittest.TestCase):
         self.assertEqual([_plural(n, *forms) for n in (1, 2, 5, 11, 21, 93, 112)],
                          ["удаление", "удаления", "удалений", "удалений", "удаление", "удаления", "удалений"])
 
+    def test_dish_tool_with_parameter(self):
+        from app.agent import run_tool
+        res = run_tool("get_dish_info", {"dish_name": "лагман"}, DATA)
+        self.assertEqual(res["dish"], "Лагман")
+        self.assertAlmostEqual(res["margin"], res["price"] - res["cost"], delta=1)
+        self.assertAlmostEqual(res["cost"], sum(x["cost"] for x in res["recipe"]), delta=0.5)
+        self.assertIn(res["group"], {"Звезда", "Лошадка", "Загадка", "Собака"})
+
+    def test_dish_tool_unknown_dish(self):
+        from app.agent import run_tool
+        res = run_tool("get_dish_info", {"dish_name": "Пицца"}, DATA)
+        self.assertIn("error", res)
+        self.assertIn("Лагман", res["menu"])
+
+    def test_demo_routes_dish_question(self):
+        r = ask_demo("Расскажи про лагман", DATA)
+        self.assertEqual(r["tools_used"], ["get_dish_info"])
+        self.assertIn("Техкарта", r["answer"])
+
     def test_purchase_question(self):
         r = ask_demo("Что заказать поставщику?", DATA)
         self.assertIn("get_purchase_order", r["tools_used"])

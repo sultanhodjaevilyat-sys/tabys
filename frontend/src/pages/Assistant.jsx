@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { api } from '../api.js'
 import { PageHeader } from '../components/ui.jsx'
 
-const examples = ['Где я теряю деньги?', 'Что заказать поставщикам на неделю?', 'Какие блюда убрать или подорожать?', 'Как прошла неделя?']
+const examples = ['Где я теряю деньги?', 'Что заказать поставщикам на неделю?', 'Какие блюда убрать или подорожать?', 'Расскажи про лагман', 'Как прошла неделя?']
 const toolNames = {
   get_dashboard: 'выручка', get_stock_losses: 'аудит склада', get_cashier_anomalies: 'аудит кассы',
   get_forecast: 'прогноз', get_purchase_order: 'заказ поставщику', get_menu_matrix: 'матрица меню',
+  get_dish_info: 'карточка блюда',
 }
 
 export default function Assistant() {
