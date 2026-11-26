@@ -13,7 +13,8 @@ export async function api(path, options = {}) {
   return res.json()
 }
 
-export const tenge = (n) => `${Math.round(n).toLocaleString('ru-RU')} ₸`
+// неразрывный пробел: знак ₸ никогда не переносится на новую строку отдельно от суммы
+export const tenge = (n) => `${Math.round(n).toLocaleString('ru-RU')}\u00a0₸`
 
 // Дробные числа по-русски: 26.55 → «26,55»
 export const num = (n) => Number(n).toLocaleString('ru-RU', { maximumFractionDigits: 2 })
